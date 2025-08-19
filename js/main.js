@@ -1,16 +1,64 @@
 // Aos - the right initialisation
 jQuery(document).ready(function () {
-    (function () {
-        // your page initialization code here
-        // the DOM will be available here
-        AOS.init({
-            duration: 750,
-            offset: 0, // offset (in px) from the original trigger point
-            anchorPlacement: 'top-bottom', // define where the AOS animations will be triggered
-        });
-    })();
+  (function () {
+    // your page initialization code here
+    // the DOM will be available here
+    AOS.init({
+      duration: 750,
+      offset: 0, // offset (in px) from the original trigger point
+      anchorPlacement: "top-bottom", // define where the AOS animations will be triggered
+    });
+  })();
 });
 // //
+
+document.addEventListener("DOMContentLoaded", function () {
+  const duration = 1500; // Длительность анимации в миллисекундах
+
+  // Получаем все элементы с классом score-item__digit
+  const targets = document.querySelectorAll(".counter");
+
+  // Создаем Observer
+  let observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        // Начинаем счетчик для каждого элемента
+        const target = entry.target;
+        const endValue = parseFloat(target.getAttribute("data-value"));
+        startCounter(target, endValue, duration);
+        observer.unobserve(target);
+      }
+    });
+  });
+
+  // Наблюдаем за каждым элементом
+  targets.forEach((target) => observer.observe(target));
+
+  function startCounter(element, endValue, duration) {
+    let startValue = 0;
+    let startTime = null;
+
+    function updateCounter(currentTime) {
+      if (!startTime) startTime = currentTime;
+      let progress = currentTime - startTime;
+      let currentValue = Math.min(
+        endValue,
+        startValue + (progress / duration) * (endValue - startValue)
+      );
+      element.textContent = Math.round(currentValue);
+
+      if (currentValue < endValue) {
+        requestAnimationFrame(updateCounter);
+      } else {
+        element.textContent = Math.round(endValue);
+      }
+    }
+
+    requestAnimationFrame(updateCounter);
+  }
+});
+
+//
 
 document.querySelectorAll(".faq-item").forEach((item) => {
   item.addEventListener("click", () => {
@@ -166,6 +214,20 @@ window.addEventListener("scroll", () => {
 //     });
 // }
 //
+
+document.querySelectorAll(".langs-item").forEach((item) => {
+  item.addEventListener("mouseenter", () => {
+    if (!item.classList.contains("langs-item--active")) {
+      document.querySelector(".langs").classList.add("langs--active");
+    }
+  });
+
+  item.addEventListener("mouseleave", () => {
+    if (!item.classList.contains("langs-item--active")) {
+      document.querySelector(".langs").classList.remove("langs--active");
+    }
+  });
+});
 
 $(function () {
   function isMobileDevice() {
